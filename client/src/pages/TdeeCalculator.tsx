@@ -58,10 +58,19 @@ const macroStyles: Record<MacroKey, { label: string; protein: number; carbs: num
   },
 };
 
-// Healthy body fat % by sex (fit-to-average range)
-const bodyFatRanges: Record<Sex, { low: number; high: number; group: string }> = {
-  male: { low: 10, high: 20, group: "men" },
-  female: { low: 18, high: 28, group: "women" },
+// Body fat % that lines up with a healthy BMI (18.5–24.9), by sex and age band
+// (Gallagher et al., Am J Clin Nutr 2000). Under 20 uses the 20–39 band.
+const bmiBodyFat: Record<Sex, { maxAge: number; low: number; high: number }[]> = {
+  male: [
+    { maxAge: 39, low: 8, high: 19 },
+    { maxAge: 59, low: 11, high: 21 },
+    { maxAge: Infinity, low: 13, high: 24 },
+  ],
+  female: [
+    { maxAge: 39, low: 21, high: 32 },
+    { maxAge: 59, low: 23, high: 33 },
+    { maxAge: Infinity, low: 24, high: 35 },
+  ],
 };
 
 // Healthy BMI band, and the wider band the weight gauge spans
@@ -413,7 +422,7 @@ export default function TdeeCalculator() {
   const toDisplay = (kg: number) => Math.round(isImperial ? kg / LB_TO_KG : kg);
   const weightAtBmi = (b: number) => toDisplay(b * heightM * heightM);
   const weightUnit = isImperial ? "lb" : "kg";
-  const bodyFat = bodyFatRanges[sex];
+  const bodyFat = bmiBodyFat[sex].find((band) => ageNum <= band.maxAge)!;
 
   return (
     <div style={{ backgroundColor: "#121316", minHeight: "100vh", color: "#eceef0", fontFamily: "'Inter', sans-serif" }}>
@@ -583,20 +592,13 @@ export default function TdeeCalculator() {
               />
             )}
 
-            <div style={{ ...tileStyle, marginTop: "16px", display: "flex", alignItems: "center", gap: "14px" }}>
-              <div style={{ ...tileValueStyle, fontSize: "30px", color: healthyGreen, whiteSpace: "nowrap" }}>
-                {bodyFat.low}–{bodyFat.high}
-                <span style={unitStyle}>%</span>
-              </div>
-              <div>
-                <div style={{ ...tileLabelStyle, marginBottom: "2px" }}>Healthy Body Fat</div>
-                <div style={{ ...noteStyle, marginTop: 0 }}>
-                  A fit, healthy range for {bodyFat.group}. The lower end is where muscle definition starts to show.
-                </div>
-              </div>
-            </div>
-            <p style={{ ...noteStyle, marginTop: "10px" }}>
-              BMI doesn't account for muscle mass, so lifters often read high. Body fat % is the better measure.
+            <p style={{ ...noteStyle, marginTop: "12px" }}>
+              BMI only uses height and weight, so it can't tell muscle from fat. For your age and sex, a healthy BMI
+              lines up with roughly{" "}
+              <strong style={{ color: "#eceef0" }}>
+                {bodyFat.low}–{bodyFat.high}% body fat
+              </strong>
+              . If you lift, you can read "overweight" while sitting comfortably inside that range.
             </p>
 
             <div
