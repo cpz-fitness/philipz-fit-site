@@ -42,8 +42,8 @@ const macroStyles: Record<
   lowCarb: {
     label: "Low carb",
     proteinBonus: 0,
-    carbPct: 25,
-    note: "Carbs kept to about a quarter of your calories, fat fills the rest.",
+    carbPct: 30,
+    note: "Carbs kept to about 30% of your calories, fat fills the rest.",
   },
   balanced: {
     label: "Balanced",
