@@ -79,7 +79,7 @@ export default function Navbar() {
         }}
       >
         {/* Logo — ZF mark inline SVG + wordmark */}
-        <a href="#" style={{ display: "flex", alignItems: "center", gap: "0.6rem", textDecoration: "none" }}>
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: "0.6rem", textDecoration: "none" }}>
           <CpzLogo size={34} />
           <span
             style={{
@@ -101,13 +101,16 @@ export default function Navbar() {
             <span title="Proudly serving the gay community" style={{ fontSize: "1.3rem", lineHeight: 1 }}>
               🏳️‍🌈
             </span>
-            <a href="#about" style={linkStyle}>
+            <a href="/#about" style={linkStyle}>
               About
             </a>
-            <a href="#process" style={linkStyle}>
+            <a href="/#process" style={linkStyle}>
               The Program
             </a>
-            <a href="#book" style={primaryStyle}>
+            <a href="/tdee" style={linkStyle}>
+              TDEE Calculator
+            </a>
+            <a href="/#book" style={primaryStyle}>
               Free Consultation
             </a>
           </div>
@@ -145,21 +148,28 @@ export default function Navbar() {
           }}
         >
           <a
-            href="#about"
+            href="/#about"
             onClick={() => setMenuOpen(false)}
             style={{ ...linkStyle, fontSize: "1.05rem", color: "#eceef0" }}
           >
             About
           </a>
           <a
-            href="#process"
+            href="/#process"
             onClick={() => setMenuOpen(false)}
             style={{ ...linkStyle, fontSize: "1.05rem", color: "#eceef0" }}
           >
             The Program
           </a>
           <a
-            href="#book"
+            href="/tdee"
+            onClick={() => setMenuOpen(false)}
+            style={{ ...linkStyle, fontSize: "1.05rem", color: "#eceef0" }}
+          >
+            TDEE Calculator
+          </a>
+          <a
+            href="/#book"
             onClick={() => setMenuOpen(false)}
             style={{ ...primaryStyle, justifyContent: "center", fontSize: "1rem", padding: "0.75rem 1.4rem" }}
           >
