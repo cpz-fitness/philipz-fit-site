@@ -598,7 +598,8 @@ export default function TdeeCalculator() {
               <strong style={{ color: "#eceef0" }}>
                 {bodyFat.low}–{bodyFat.high}% body fat
               </strong>
-              . If you lift, you can read "overweight" while sitting comfortably inside that range.
+              . Without much muscle, you can land in the "normal" BMI range while your body fat sits above that,
+              so BMI can make you look healthier than you are.
             </p>
 
             <div
