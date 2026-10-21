@@ -28,8 +28,8 @@ const activityLevels = [
 
 // Calorie target = TDEE × multiplier; protein = estimated lean mass (lb) × proteinPerLb
 const goals: Record<GoalKey, { label: string; multiplier: number; proteinPerLb: number; note: string }> = {
-  lose: { label: "Lose fat", multiplier: 0.8, proteinPerLb: 1.0, note: "20% below your TDEE" },
-  maintain: { label: "Maintain", multiplier: 1, proteinPerLb: 0.9, note: "Eating at your TDEE" },
+  lose: { label: "Lose fat", multiplier: 0.8, proteinPerLb: 1.05, note: "20% below your TDEE" },
+  maintain: { label: "Maintain", multiplier: 1, proteinPerLb: 0.95, note: "Eating at your TDEE" },
   gain: { label: "Build muscle", multiplier: 1.1, proteinPerLb: 1.0, note: "10% above your TDEE" },
 };
 
@@ -53,9 +53,9 @@ const macroStyles: Record<
   },
   highProtein: {
     label: "High protein",
-    proteinBonus: 0.1,
+    proteinBonus: 0.05,
     fatPct: 30,
-    note: "An extra 0.1 g of protein per lb of lean mass. Helps with hunger on a cut and recovery when training hard.",
+    note: "An extra 0.05 g of protein per lb of lean mass. Helps with hunger on a cut and recovery when training hard.",
   },
 };
 
@@ -701,7 +701,9 @@ export default function TdeeCalculator() {
                   </strong>{" "}
                   at a healthy weight for your height, at{" "}
                   <strong style={{ color: "#eceef0" }}>
-                    {isImperial ? `${proteinPerLb.toFixed(1)} g per lb` : `${(proteinPerLb / LB_TO_KG).toFixed(1)} g per kg`}
+                    {isImperial
+                      ? `${Number(proteinPerLb.toFixed(2))} g per lb`
+                      : `${(proteinPerLb / LB_TO_KG).toFixed(1)} g per kg`}
                   </strong>
                   . It's not based on total weight or calories, so it doesn't balloon as calories go up.
                 </InfoNote>
