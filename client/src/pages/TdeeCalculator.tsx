@@ -273,6 +273,26 @@ function NumberInput({
   );
 }
 
+// Orange-tinted info box for the formula and BMI caveats
+function InfoNote({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: "10px",
+        marginTop: "18px",
+        padding: "12px 14px",
+        background: "rgba(255,140,0,0.06)",
+        border: "1px solid rgba(255,140,0,0.15)",
+        borderRadius: "12px",
+      }}
+    >
+      <Info size={16} color="#ff8c00" style={{ flexShrink: 0, marginTop: "2px" }} aria-hidden />
+      <p style={{ ...noteStyle, margin: 0 }}>{children}</p>
+    </div>
+  );
+}
+
 // Labelled stacked bar; segment widths are proportional to `value`
 function StackedBar({ segments }: { segments: { label: string; value: number; color: string }[] }) {
   const total = segments.reduce((sum, s) => sum + s.value, 0) || 1;
@@ -557,6 +577,12 @@ export default function TdeeCalculator() {
               />
             )}
 
+            <InfoNote>
+              Calculated with the Mifflin-St Jeor equation, multiplied by an activity factor. It's an estimate: real
+              needs can vary by ±10% or more depending on muscle mass, genetics, sleep, stress and how accurately
+              activity is picked. Use it as a starting point, track your weight for 2–3 weeks, and adjust.
+            </InfoNote>
+
             <div style={dividerStyle} />
 
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
@@ -592,7 +618,7 @@ export default function TdeeCalculator() {
               />
             )}
 
-            <p style={{ ...noteStyle, marginTop: "12px" }}>
+            <InfoNote>
               BMI only uses height and weight, so it can't tell muscle from fat. For your age and sex, a healthy BMI
               lines up with roughly{" "}
               <strong style={{ color: "#eceef0" }}>
@@ -600,26 +626,7 @@ export default function TdeeCalculator() {
               </strong>
               . Without much muscle, you can land in the "normal" BMI range while your body fat sits above that,
               so BMI can underestimate your score, leading you to appear healthier than you are.
-            </p>
-
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                marginTop: "20px",
-                padding: "12px 14px",
-                background: "rgba(255,140,0,0.06)",
-                border: "1px solid rgba(255,140,0,0.15)",
-                borderRadius: "12px",
-              }}
-            >
-              <Info size={16} color="#ff8c00" style={{ flexShrink: 0, marginTop: "2px" }} aria-hidden />
-              <p style={{ ...noteStyle, margin: 0 }}>
-                Calculated with the Mifflin-St Jeor equation, multiplied by an activity factor. It's an estimate: real
-                needs can vary by ±10% or more depending on muscle mass, genetics, sleep, stress and how accurately
-                activity is picked. Use it as a starting point, track your weight for 2–3 weeks, and adjust.
-              </p>
-            </div>
+            </InfoNote>
           </section>
 
           {/* Right: calorie target + macros, then CTA */}
