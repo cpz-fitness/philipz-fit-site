@@ -599,7 +599,7 @@ export default function TdeeCalculator() {
                 {bodyFat.low}–{bodyFat.high}% body fat
               </strong>
               . Without much muscle, you can land in the "normal" BMI range while your body fat sits above that,
-              so BMI can make you look healthier than you are.
+              so BMI can underestimate your score, leading you to appear healthier than you are.
             </p>
 
             <div
