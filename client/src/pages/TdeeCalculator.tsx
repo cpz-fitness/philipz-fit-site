@@ -465,7 +465,7 @@ export default function TdeeCalculator() {
       <Navbar />
 
       <main className="tdee-main">
-        <header style={{ marginBottom: "24px", maxWidth: "620px" }}>
+        <header style={{ marginBottom: "28px", maxWidth: "720px" }}>
           <div
             style={{
               fontFamily: "'Poppins', sans-serif",
@@ -489,8 +489,19 @@ export default function TdeeCalculator() {
           >
             TDEE Calculator
           </h1>
-          <p style={{ color: "#aeb2b8", fontSize: "15px", lineHeight: 1.55, margin: 0 }}>
+          <p style={{ color: "#eceef0", fontSize: "16px", lineHeight: 1.55, margin: 0 }}>
             Find out how many calories your body burns in a day, and how to split them into protein, carbs and fat.
+          </p>
+          <p style={{ color: "#aeb2b8", fontSize: "14.5px", lineHeight: 1.65, margin: "14px 0 0" }}>
+            <strong style={{ color: "#eceef0" }}>TDEE</strong> stands for{" "}
+            <strong style={{ color: "#eceef0" }}>Total Daily Energy Expenditure</strong>: every calorie your body
+            burns in a day. Most of it is your <strong style={{ color: "#eceef0" }}>BMR</strong>, the energy it takes
+            just to keep you alive (breathing, heartbeat, brain, organs), even if you stayed in bed all day. The rest
+            comes from moving: workouts, walking, your job, even fidgeting.
+          </p>
+          <p style={{ color: "#aeb2b8", fontSize: "14.5px", lineHeight: 1.65, margin: "10px 0 0" }}>
+            It's the number everything else is built on. Eat around your TDEE and your weight holds steady. Eat
+            below it and you lose fat. Eat a little above it, with training, and you build muscle.
           </p>
         </header>
 
