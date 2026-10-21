@@ -26,37 +26,41 @@ const activityLevels = [
   { value: 1.9, label: "Extra active — physical job + training" },
 ];
 
-// Calorie target = TDEE × multiplier
-const goals: Record<GoalKey, { label: string; multiplier: number; note: string }> = {
-  lose: { label: "Lose fat", multiplier: 0.8, note: "20% below your TDEE" },
-  maintain: { label: "Maintain", multiplier: 1, note: "Eating at your TDEE" },
-  gain: { label: "Build muscle", multiplier: 1.1, note: "10% above your TDEE" },
+// Calorie target = TDEE × multiplier; protein = estimated lean mass (lb) × proteinPerLb
+const goals: Record<GoalKey, { label: string; multiplier: number; proteinPerLb: number; note: string }> = {
+  lose: { label: "Lose fat", multiplier: 0.8, proteinPerLb: 1.0, note: "20% below your TDEE" },
+  maintain: { label: "Maintain", multiplier: 1, proteinPerLb: 0.9, note: "Eating at your TDEE" },
+  gain: { label: "Build muscle", multiplier: 1.1, proteinPerLb: 1.0, note: "10% above your TDEE" },
 };
 
-// Percent of calories from each macro (must sum to 100)
-const macroStyles: Record<MacroKey, { label: string; protein: number; carbs: number; fat: number; note: string }> = {
+// After protein, each style sets either fat or carbs as a % of target calories;
+// the other macro fills whatever calories are left
+const macroStyles: Record<
+  MacroKey,
+  { label: string; note: string; proteinBonus: number } & ({ fatPct: number } | { carbPct: number })
+> = {
   lowCarb: {
     label: "Low carb",
-    protein: 35,
-    carbs: 20,
-    fat: 45,
-    note: "Fewer carbs, more fat. Good if you feel better with steadier energy and fewer cravings.",
+    proteinBonus: 0,
+    carbPct: 25,
+    note: "Carbs kept to about a quarter of your calories, fat fills the rest.",
   },
   balanced: {
     label: "Balanced",
-    protein: 30,
-    carbs: 40,
-    fat: 30,
-    note: "An even split that's easy to stick to and fuels training well.",
+    proteinBonus: 0,
+    fatPct: 30,
+    note: "Fat at 30% of calories, carbs fuel the rest.",
   },
   highProtein: {
     label: "High protein",
-    protein: 40,
-    carbs: 35,
-    fat: 25,
-    note: "Best for building muscle, or keeping it while you lose fat.",
+    proteinBonus: 0.1,
+    fatPct: 30,
+    note: "An extra 0.1 g of protein per lb of lean mass. Helps with hunger on a cut and recovery when training hard.",
   },
 };
+
+// Fat never drops below this % of calories (hormone health)
+const MIN_FAT_PCT = 20;
 
 // Body fat % that lines up with a healthy BMI (18.5–24.9), by sex and age band
 // (Gallagher et al., Am J Clin Nutr 2000). Under 20 uses the 20–39 band.
@@ -426,15 +430,6 @@ export default function TdeeCalculator() {
   // From rounded values so BMR + Activity always adds up to the displayed TDEE
   const activityKcal = Math.round(tdee) - Math.round(bmr);
 
-  const goal = goals[goalKey];
-  const target = tdee * goal.multiplier;
-  const macros = macroStyles[macroKey];
-  const macroRows = [
-    { key: "protein", label: "Protein", pct: macros.protein, kcalPerGram: 4 },
-    { key: "carbs", label: "Carbs", pct: macros.carbs, kcalPerGram: 4 },
-    { key: "fat", label: "Fat", pct: macros.fat, kcalPerGram: 9 },
-  ] as const;
-
   const heightM = heightCmNum / 100;
   const bmi = weightKg / (heightM * heightM);
   const tag = bmiTag(bmi);
@@ -443,6 +438,26 @@ export default function TdeeCalculator() {
   const weightAtBmi = (b: number) => toDisplay(b * heightM * heightM);
   const weightUnit = isImperial ? "lb" : "kg";
   const bodyFat = bmiBodyFat[sex].find((band) => ageNum <= band.maxAge)!;
+
+  // Estimated lean mass: top of the healthy weight range at the top of the healthy body fat band
+  const leanMassLb = ((BMI_HEALTHY.high * heightM * heightM) / LB_TO_KG) * (1 - bodyFat.high / 100);
+
+  // Top-down calorie budget: protein first (grams from lean mass), then fat or carbs by style
+  const goal = goals[goalKey];
+  const target = tdee * goal.multiplier;
+  const macros = macroStyles[macroKey];
+  const proteinPerLb = goal.proteinPerLb + macros.proteinBonus;
+  const proteinKcal = leanMassLb * proteinPerLb * 4;
+  const remainingKcal = Math.max(0, target - proteinKcal);
+  const styledFatKcal = "fatPct" in macros ? (target * macros.fatPct) / 100 : remainingKcal - (target * macros.carbPct) / 100;
+  const fatKcal = Math.min(remainingKcal, Math.max(styledFatKcal, (target * MIN_FAT_PCT) / 100));
+  const carbKcal = remainingKcal - fatKcal;
+  const macroRows = [
+    { key: "protein", label: "Protein", kcal: proteinKcal, kcalPerGram: 4 },
+    { key: "carbs", label: "Carbs", kcal: carbKcal, kcalPerGram: 4 },
+    { key: "fat", label: "Fat", kcal: fatKcal, kcalPerGram: 9 },
+  ] as const;
+  const pctOfTarget = (kcal: number) => (target > 0 ? Math.round((kcal / target) * 100) : 0);
 
   return (
     <div style={{ backgroundColor: "#121316", minHeight: "100vh", color: "#eceef0", fontFamily: "'Inter', sans-serif" }}>
@@ -658,27 +673,39 @@ export default function TdeeCalculator() {
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginTop: "14px" }}>
-                {macroRows.map((m) => {
-                  const kcal = (target * m.pct) / 100;
-                  return (
-                    <div key={m.key} style={{ ...tileStyle, borderTop: `3px solid ${macroColors[m.key]}` }}>
-                      <div style={tileLabelStyle}>{m.label}</div>
-                      <div style={tileValueStyle}>
-                        {valid ? Math.round(kcal / m.kcalPerGram) : "—"}
-                        <span style={unitStyle}>g</span>
-                      </div>
-                      <div style={{ ...noteStyle, fontSize: "11px" }}>
-                        {valid ? `${fmt(kcal)} cal · ` : ""}
-                        {m.pct}%
-                      </div>
+                {macroRows.map((m) => (
+                  <div key={m.key} style={{ ...tileStyle, borderTop: `3px solid ${macroColors[m.key]}` }}>
+                    <div style={tileLabelStyle}>{m.label}</div>
+                    <div style={tileValueStyle}>
+                      {valid ? Math.round(m.kcal / m.kcalPerGram) : "—"}
+                      <span style={unitStyle}>g</span>
                     </div>
-                  );
-                })}
+                    <div style={{ ...noteStyle, fontSize: "11px" }}>
+                      {valid ? `${fmt(m.kcal)} cal · ${pctOfTarget(m.kcal)}%` : "—"}
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <StackedBar
-                segments={macroRows.map((m) => ({ label: m.label, value: m.pct, color: macroColors[m.key] }))}
-              />
+              {valid && (
+                <StackedBar
+                  segments={macroRows.map((m) => ({ label: m.label, value: m.kcal, color: macroColors[m.key] }))}
+                />
+              )}
+
+              {valid && (
+                <InfoNote>
+                  Protein is based on your estimated lean mass, about{" "}
+                  <strong style={{ color: "#eceef0" }}>
+                    {isImperial ? `${Math.round(leanMassLb)} lb` : `${Math.round(leanMassLb * LB_TO_KG)} kg`}
+                  </strong>{" "}
+                  at a healthy weight for your height, at{" "}
+                  <strong style={{ color: "#eceef0" }}>
+                    {isImperial ? `${proteinPerLb.toFixed(1)} g per lb` : `${(proteinPerLb / LB_TO_KG).toFixed(1)} g per kg`}
+                  </strong>
+                  . It's not based on total weight or calories, so it doesn't balloon as calories go up.
+                </InfoNote>
+              )}
             </section>
 
             <section style={{ ...cardStyle, textAlign: "center", padding: "28px 20px" }}>
@@ -691,7 +718,7 @@ export default function TdeeCalculator() {
                   margin: "0 0 8px",
                 }}
               >
-                Numbers are the start.
+                Numbers are just the start.
               </h2>
               <p style={{ color: "#aeb2b8", fontSize: "14.5px", lineHeight: 1.55, margin: "0 0 18px" }}>
                 Want a plan built around them?
