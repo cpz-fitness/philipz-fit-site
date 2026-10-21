@@ -493,11 +493,12 @@ export default function TdeeCalculator() {
             Find out how many calories your body burns in a day, and how to split them into protein, carbs and fat.
           </p>
           <p style={{ color: "#aeb2b8", fontSize: "14.5px", lineHeight: 1.65, margin: "14px 0 0" }}>
-            <strong style={{ color: "#eceef0" }}>TDEE</strong> stands for{" "}
-            <strong style={{ color: "#eceef0" }}>Total Daily Energy Expenditure</strong>: every calorie your body
-            burns in a day. Most of it is your <strong style={{ color: "#eceef0" }}>BMR</strong>, the energy it takes
-            just to keep you alive (breathing, heartbeat, brain, organs), even if you stayed in bed all day. The rest
-            comes from moving: workouts, walking, your job, even fidgeting.
+            Your <strong style={{ color: "#eceef0" }}>Total Daily Energy Expenditure (TDEE)</strong> is the estimated
+            number of calories your body burns in a day. Most of it is from your{" "}
+            <strong style={{ color: "#eceef0" }}>BMR (Basal Metabolic Rate)</strong>, the energy it takes just to keep
+            you alive (breathing, heartbeat, brain, organs), even if you stayed in bed all day. The rest comes from
+            moving (workouts, walking, your job, even fidgeting), plus digesting your food, known as the thermic
+            effect of food.
           </p>
           <p style={{ color: "#aeb2b8", fontSize: "14.5px", lineHeight: 1.65, margin: "10px 0 0" }}>
             It's the number everything else is built on. Eat around your TDEE and your weight holds steady. Eat
