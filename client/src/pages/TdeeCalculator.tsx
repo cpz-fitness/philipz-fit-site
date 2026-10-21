@@ -465,7 +465,7 @@ export default function TdeeCalculator() {
       <Navbar />
 
       <main className="tdee-main">
-        <header style={{ marginBottom: "28px", maxWidth: "720px" }}>
+        <header style={{ marginBottom: "28px" }}>
           <div
             style={{
               fontFamily: "'Poppins', sans-serif",
