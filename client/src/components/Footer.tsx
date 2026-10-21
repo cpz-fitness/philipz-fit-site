@@ -6,9 +6,10 @@
 import CpzLogo from "./CpzLogo";
 
 const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "The Program", href: "#process" },
-  { label: "Free Consultation", href: "#book" },
+  { label: "About", href: "/#about" },
+  { label: "The Program", href: "/#process" },
+  { label: "TDEE Calculator", href: "/tdee" },
+  { label: "Free Consultation", href: "/#book" },
 ];
 
 const socials = [
